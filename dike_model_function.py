@@ -4,15 +4,17 @@ Created on Tue Oct 31 13:18:05 2017
 
 @author: ciullo
 """
-from __future__ import division
-from copy import deepcopy
+import copy
+import numpy as np
+import pandas as pd
+
+
+from ema_workbench import ema_logging
 
 import funs_generate_network
 from funs_dikes import Lookuplin, dikefailure, init_node
 from funs_economy import cost_fun, discount, cost_evacuation
 from funs_hydrostat import werklijn_cdf, werklijn_inv
-import numpy as np
-import pandas as pd
 
 
 def Muskingum(C1, C2, C3, Qn0_t1, Qn0_t0, Qn1_t0):
@@ -74,7 +76,7 @@ class DikeNetwork(object):
             for n in dikenodes:
                 node = G.nodes[n]
                 # Create a copy of the rating curve that will be used in the sim:
-                node['rnew'] = deepcopy(node['r'])
+                node['rnew'] = copy.deepcopy(node['r'])
 
                 # Initialize outcomes of interest (ooi):
                 node[f'losses {s}'] = []
@@ -94,7 +96,8 @@ class DikeNetwork(object):
                 # 1 Initialize fragility curve
                 # 2 Shift it to the degree of dike heigthening:
                 # 3 Calculate cumulative raising
-                node[f'fnew {s}'] = deepcopy(node['f'])
+
+                node[f'fnew {s}'] = copy.deepcopy(node['f'])
                 node[f'dikeh_cum {s}'] = 0
                 
                 for ss in steps[steps <= s]:
@@ -115,7 +118,7 @@ class DikeNetwork(object):
 
     def __call__(self, timestep=1, **kwargs):
 
-        G = self.G
+        G = copy.deepcopy(self.G)
         Qpeaks = self.Qpeaks
         dikelist = self.dikelist
 
@@ -279,14 +282,10 @@ class DikeNetwork(object):
 
                 data.update({f'{dike}_Expected Annual Damage {s}': disc_EAD,
                          f'{dike}_Expected Number of Deaths {s}': END,
-                         '{}_Dike Investment Costs {}'.format(dike,s
-                                              ): node[f'dikecosts {s}']})
+                         f'{dike}_Dike Investment Costs {s}': node[f'dikecosts {s}']})
 
             data.update({f'RfR Total Costs {s}': G.nodes[
                                 f'RfR_projects {s}']['cost'.format(s)]})
             data.update({f'Expected Evacuation Costs {s}': np.sum(EECosts)})
 
         return data
-
-
-
