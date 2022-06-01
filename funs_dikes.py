@@ -5,6 +5,7 @@ Created on Thu Jul 06 14:51:04 2017
 @author: ciullo
 """
 import numpy as np
+from scipy.interpolate import interp1d
 
 
 def dikefailure(sb, inflow, hriver, hbas, hground, status_t1,
@@ -65,6 +66,8 @@ def Lookuplin(MyFile, inputcol, searchcol, inputvalue):
     minTableValue = np.min(col_values)
     maxTableValue = np.max(col_values)
 
+    inputvalue2 = inputvalue
+
     if inputvalue >= maxTableValue:
         inputvalue = maxTableValue - 0.01
     elif inputvalue < minTableValue:
@@ -77,8 +80,25 @@ def Lookuplin(MyFile, inputcol, searchcol, inputvalue):
 
     outpuvalue = C - ((D - C) * ((inputvalue - A) / (A - B))) * 1.0
 
+    lin2, lin3 = Lookuplin2(MyFile, inputcol, searchcol, inputvalue2), Lookuplin3(MyFile, inputcol, searchcol, inputvalue2)
+    if lin2 != outpuvalue or lin3 != outpuvalue:
+        print("### WARNING: LOOKUPS DIFFER ###")
+        print(f"Input value: {inputvalue2}, bounds: {minTableValue}, {maxTableValue}")
+        print(f"Function returns: 1def: {outpuvalue}, 2extrap: {lin2}, 3bounds: {lin3}")
+        breakpoint()
+
     return outpuvalue
 
+def Lookuplin2(MyFile, inputcol, searchcol, inputvalue):
+    ''' Linear lookup function '''
+    lookup_function = interp1d(MyFile[:, inputcol], MyFile[:, searchcol], kind='linear', fill_value="extrapolate")
+    return lookup_function(inputvalue)
+
+def Lookuplin3(MyFile, inputcol, searchcol, inputvalue):
+    ''' Linear lookup function '''
+    bounds = (MyFile[:, searchcol].min(), MyFile[:, searchcol].max())
+    lookup_function = interp1d(MyFile[:, inputcol], MyFile[:, searchcol], kind='linear', fill_value=bounds, bounds_error=False)
+    return lookup_function(inputvalue)
 
 def init_node(value, time):
     init = np.repeat(value, len(time)).tolist()
