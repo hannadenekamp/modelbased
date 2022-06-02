@@ -66,8 +66,6 @@ def Lookuplin(MyFile, inputcol, searchcol, inputvalue):
     minTableValue = np.min(col_values)
     maxTableValue = np.max(col_values)
 
-    inputvalue2 = inputvalue
-
     if inputvalue >= maxTableValue:
         inputvalue = maxTableValue - 0.01
     elif inputvalue < minTableValue:
@@ -80,31 +78,7 @@ def Lookuplin(MyFile, inputcol, searchcol, inputvalue):
 
     outpuvalue = C - ((D - C) * ((inputvalue - A) / (A - B))) * 1.0
 
-    lin2, lin3 = Lookuplin2(MyFile, inputcol, searchcol, inputvalue2), Lookuplin3(MyFile, inputcol, searchcol, inputvalue2)
-    if lin2 != lin3:
-        if not np.all(np.diff(MyFile[:, inputcol]) > 0):
-            print("Not all values of x are increasing")
-        print("### WARNING: LOOKUPS DIFFER ###")
-        print(f"Input value: {inputvalue2}, bounds: {minTableValue}, {maxTableValue}")
-        print(f"Function returns: 1def: {outpuvalue}, 2scipy: {lin2}, 3numpy: {lin3}")
-        breakpoint()
-
     return outpuvalue
-
-def Lookuplin2(MyFile, inputcol, searchcol, inputvalue):
-    ''' Linear lookup function '''
-    bounds = (MyFile[:, searchcol].min(), MyFile[:, searchcol].max())
-    lookup_function = interp1d(MyFile[:, inputcol], MyFile[:, searchcol], kind='linear', fill_value=bounds, bounds_error=False)
-    return lookup_function(inputvalue)
-
-def Lookuplin3(MyFile, inputcol, searchcol, inputvalue):
-    ''' Linear lookup function '''
-    # Copy input and search colums from NumPy array
-    inputa, searcha = MyFile[:, inputcol], MyFile[:, searchcol]
-    # Define the lower and upper bound for the return value
-    rmin, rmax = searcha.min(), searcha.max()
-    # Interpolate the inputvalue and clip to the bounds
-    return np.clip(np.interp(inputvalue, np.sort(MyFile[:, inputcol]), MyFile[:, searchcol]), rmin, rmax)
 
 def init_node(value, time):
     init = np.repeat(value, len(time)).tolist()
