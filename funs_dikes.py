@@ -61,53 +61,8 @@ def dikefailure(sb, inflow, hriver, hbas, hground, status_t1,
 
 def Lookuplin(MyFile, inputcol, searchcol, inputvalue):
     ''' Linear lookup function '''
-
-    col_values = MyFile[:, inputcol]
-    search_values = MyFile[:, searchcol]
-    minTableValue = np.min(col_values)
-    maxTableValue = np.max(col_values)
-
-    inputvalue2 = inputvalue
-
-    if inputvalue >= maxTableValue:
-        inputvalue = maxTableValue - 0.0001
-    elif inputvalue < minTableValue:
-        inputvalue = minTableValue + 0.0001
-
-    A = np.max(MyFile[col_values <= inputvalue, inputcol])
-    B = np.min(MyFile[col_values > inputvalue, inputcol])
-    C = np.max(MyFile[col_values == A, searchcol])
-    D = np.min(MyFile[col_values == B, searchcol])
-
-    outpuvalue = C - ((D - C) * ((inputvalue - A) / (A - B))) * 1.0
-
-    lin2, lin3 = Lookuplin2(MyFile, inputcol, searchcol, inputvalue2), Lookuplin3(MyFile, inputcol, searchcol, inputvalue2)
-    if 0.001 < (diff := abs(lin3/outpuvalue-1)):
-        print(f"### WARNING: LOOKUPS DIFFER by {diff} ###")
-        print(f"Input value: {inputvalue2}, bounds: {minTableValue}, {maxTableValue}")
-        print(f"Function returns: 1def: {outpuvalue}, 2scipy: {lin2}, 3numpy: {lin3}")
-        if not np.all(np.diff(MyFile[:, inputcol]) > 0):
-            print("Not all values of x are increasing")
-        breakpoint()
-    else:
-        print("Ok")
-
-    return outpuvalue
-
-def Lookuplin2(MyFile, inputcol, searchcol, inputvalue):
-    ''' Linear lookup function '''
-    bounds = (MyFile[:, searchcol].min(), MyFile[:, searchcol].max())
-    lookup_function = interp1d(MyFile[:, inputcol], MyFile[:, searchcol], kind='linear', fill_value=bounds, bounds_error=False)
-    return lookup_function(inputvalue)
-
-def Lookuplin3(MyFile, inputcol, searchcol, inputvalue):
-    ''' Linear lookup function '''
-    # Copy input and search colums from NumPy array
-    #inputa, searcha = MyFile[:, inputcol], MyFile[:, searchcol]
-    # Define the lower and upper bound for the return value
-    #rmin, rmax = searcha.min(), searcha.max()
-    # Interpolate the inputvalue and clip to the bounds
     return np.interp(inputvalue, MyFile[:, inputcol], MyFile[:, searchcol])
+
 
 def init_node(value, time):
     init = np.repeat(value, len(time)).tolist()
