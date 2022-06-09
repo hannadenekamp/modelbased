@@ -26,7 +26,7 @@ Expected_Number_of_Deaths = functools.partial(robustness, SMALLER, 1) #not ok
 Expected_Annual_Damage = functools.partial(robustness, SMALLER, 2000e6) #THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
 Total_Investment_Costs = functools.partial(robustness, SMALLER, 300e6)#THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
 
-nfe = 20000
+nfe = 100
 
 MAXIMIZE = ScalarOutcome.MAXIMIZE
 MINIMIZE = ScalarOutcome.MINIMIZE
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
 
     if use_pickle1:
-        with open('data/formulation_results.pickle', 'rb') as filehandler:
+        with open('data/formulation_results1.pickle', 'rb') as filehandler:
             results = pickle.load(filehandler)
 
     else:
@@ -62,7 +62,6 @@ if __name__ == '__main__':
                                                 convergence=convergence, epsilons=epsilons)
 
         # Save results in Pickle file
-        with open('data/formulation_results.pickle', 'wb') as filehandler:
+        with open('data/formulation_results1.pickle', 'wb') as filehandler:
             pickle.dump(results, filehandler)
 
-    archive, convergence = results
