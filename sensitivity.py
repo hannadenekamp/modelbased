@@ -1,8 +1,8 @@
 # True, use results in pickle file; False, run MultiprocessingEvaluator
 import pickle
 from ema_workbench import Samplers
-from __future__ import (unicode_literals, print_function, absolute_import,
-                        division)
+# from __future__ import (unicode_literals, print_function, absolute_import,
+#                         division)
 
 
 from ema_workbench import (Model, MultiprocessingEvaluator, Policy,
@@ -51,6 +51,7 @@ if __name__ == '__main__':
         pol0.update({key.name: zero_policy[s2]})
 
     policy0 = Policy('Policy 0', **pol0)
+    dike_model, planning_steps = get_model_for_problem_formulation(1)
 
     if use_pickle1:
         with open('data/sensitivity_results.pickle', 'rb') as filehandler:
