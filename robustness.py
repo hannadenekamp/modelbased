@@ -16,6 +16,7 @@ import functools
 from problem_formulation import get_model_for_problem_formulation
 
 model, _ = get_model_for_problem_formulation(1)
+np.random.seed(0)
 
 def robustness(direction, threshold, data):
     if direction == SMALLER:
@@ -32,12 +33,12 @@ Expected_Number_of_Deaths = functools.partial(robustness, SMALLER, 0.001) #not o
 Expected_Annual_Damage = functools.partial(robustness, SMALLER, 80e6) #THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
 Total_Investment_Costs = costs #THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
 
-n_scenarios = 15
+n_scenarios = 30
 scenarios = sample_uncertainties(model, n_scenarios)
 # with open('data/scenariosselection.pickle', 'rb') as filehandler:
 #         scenarios = pickle.load(filehandler)
 
-nfe = int(15000)  # Original value: 1000
+nfe = int(20000)  # Original value: 1000
 
 MAXIMIZE = ScalarOutcome.MAXIMIZE
 MINIMIZE = ScalarOutcome.MINIMIZE
@@ -46,15 +47,15 @@ funcs = {'Expected Number of Deaths':Expected_Number_of_Deaths,
          'Expected Annual Damage': Expected_Annual_Damage,
          'Total Investment Costs': Total_Investment_Costs}
 
-robustnes_functions = [ScalarOutcome('Expected Number of Deaths', kind=MINIMIZE,
+robustnes_functions = [ScalarOutcome('Expected Number of Deaths', kind=MAXIMIZE,
                                      function=Expected_Number_of_Deaths),
-                       ScalarOutcome('Expected Annual Damage', kind=MINIMIZE,
+                       ScalarOutcome('Expected Annual Damage', kind=MAXIMIZE,
                                      function=Expected_Annual_Damage),
-                       ScalarOutcome('Total Investment Costs', kind=MINIMIZE,
+                       ScalarOutcome('Total Investment Costs', kind=MAXIMIZE,
                                      function=Total_Investment_Costs),
                       ]
 if __name__ == '__main__':
-
+    np.random.seed(0)
     use_pickle4 = False
     if use_pickle4:
         with open('data/moro_results7.pickle', 'rb') as filehandler:
