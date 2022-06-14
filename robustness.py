@@ -64,7 +64,7 @@ if __name__ == '__main__':
         # we have to change the plausible max for total investment costs
         convergence = [EpsilonProgress()]
 
-        epsilons=[0.05,]*len(robustnes_functions)  #final value of epsilon should be much lower.Just for experiment purposes is 1
+        epsilons=[0.1,]*len(robustnes_functions)  #final value of epsilon should be much lower.Just for experiment purposes is 1
         with MultiprocessingEvaluator(model, n_processes=10) as evaluator:
             results4 = evaluator.robust_optimize(robustnes_functions, scenarios, nfe=nfe,
                                                             convergence=convergence, epsilons=epsilons)
