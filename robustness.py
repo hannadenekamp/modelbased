@@ -1,6 +1,10 @@
-from ema_workbench.em_framework.optimization import EpsilonProgress
+
+from ema_workbench.em_framework import sample_uncertainties
+
 from ema_workbench import (Model, CategoricalParameter,
                            ScalarOutcome, IntegerParameter, RealParameter)
+
+from ema_workbench.em_framework.optimization import EpsilonProgress
 from ema_workbench import ema_logging, MultiprocessingEvaluator, SequentialEvaluator, Samplers
 import numpy as np
 import pandas as pd
@@ -12,7 +16,7 @@ import functools
 from problem_formulation import get_model_for_problem_formulation
 
 model, _ = get_model_for_problem_formulation(1)
-convergence = [EpsilonProgress()]
+np.random.seed(0)
 
 def robustness(direction, threshold, data):
     if direction == SMALLER:
@@ -22,11 +26,19 @@ def robustness(direction, threshold, data):
 
 SMALLER = 'SMALLER'
 
-Expected_Number_of_Deaths = functools.partial(robustness, SMALLER, 1) #not ok
-Expected_Annual_Damage = functools.partial(robustness, SMALLER, 2000e6) #THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
-Total_Investment_Costs = functools.partial(robustness, SMALLER, 300e6)#THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
+def costs(data):
+    return data[0]/1e9 # makes numbers nicer
 
-nfe = 20000
+Expected_Number_of_Deaths = functools.partial(robustness, SMALLER, 0.001) #not ok
+Expected_Annual_Damage = functools.partial(robustness, SMALLER, 80e6) #THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
+Total_Investment_Costs = costs #THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
+
+n_scenarios = 30
+scenarios = sample_uncertainties(model, n_scenarios)
+# with open('data/scenariosselection.pickle', 'rb') as filehandler:
+#         scenarios = pickle.load(filehandler)
+
+nfe = int(20000)  # Original value: 1000
 
 MAXIMIZE = ScalarOutcome.MAXIMIZE
 MINIMIZE = ScalarOutcome.MINIMIZE
@@ -42,27 +54,20 @@ robustnes_functions = [ScalarOutcome('Expected Number of Deaths', kind=MAXIMIZE,
                        ScalarOutcome('Total Investment Costs', kind=MAXIMIZE,
                                      function=Total_Investment_Costs),
                       ]
-
-epsilons=[0.05,]*len(funcs)  #final value of epsilon should be much lower.Just for experiment purposes is 1
-
-# True, use results in pickle file; False, run MultiprocessingEvaluator
-use_pickle1 = False
-
 if __name__ == '__main__':
-
-
-    if use_pickle1:
-        with open('data/formulation_results.pickle', 'rb') as filehandler:
-            results = pickle.load(filehandler)
-
+    np.random.seed(0)
+    use_pickle4 = False
+    if use_pickle4:
+        with open('data/moro_results7.pickle', 'rb') as filehandler:
+            results4 = pickle.load(filehandler)
     else:
-        scenarios = 10
+        # we have to change the plausible max for total investment costs
+        convergence = [EpsilonProgress()]
+
+        epsilons=[0.1,]*len(robustnes_functions)  #final value of epsilon should be much lower.Just for experiment purposes is 1
         with MultiprocessingEvaluator(model, n_processes=10) as evaluator:
-            results = evaluator.robust_optimize(robustnes_functions, scenarios,nfe=nfe, 
-                                                convergence=convergence, epsilons=epsilons)
-
+            results4 = evaluator.robust_optimize(robustnes_functions, scenarios, nfe=nfe,
+                                                            convergence=convergence, epsilons=epsilons)
         # Save results in Pickle file
-        with open('data/formulation_results.pickle', 'wb') as filehandler:
-            pickle.dump(results, filehandler)
-
-    archive, convergence = results
+        with open("data/moro_results7.pickle","wb") as filehandler:
+            pickle.dump(results4, filehandler)
