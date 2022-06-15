@@ -7,13 +7,15 @@ Created on Wed Mar 21 17:34:11 2018
 from ema_workbench import (Model, CategoricalParameter,
                            ScalarOutcome, IntegerParameter, RealParameter)
 from dike_model_function import DikeNetwork  # @UnresolvedImport
-
+import numpy as np
 
 def sum_over(*args):
     return sum(args)
 
 
 def get_model_for_problem_formulation(problem_formulation_id):
+    np.random.seed(0)
+
     ''' Prepare DikeNetwork in a way it can be input in the EMA-workbench.
     Specify uncertainties, levers and problem formulation.
     '''

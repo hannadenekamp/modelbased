@@ -6,6 +6,7 @@ Created on Sun Oct 29 15:55:19 2017
 """
 import random
 import numpy as np
+np.random.seed(0)
 
 #
 

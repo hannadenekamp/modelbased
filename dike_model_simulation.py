@@ -10,9 +10,11 @@ from ema_workbench.em_framework.samplers import sample_uncertainties
 from ema_workbench.util import ema_logging
 import time
 from problem_formulation import get_model_for_problem_formulation
-
+import numpy as np
 
 if __name__ == '__main__':
+    np.random.seed(0)
+
     ema_logging.log_to_stderr(ema_logging.INFO)
 
     dike_model, planning_steps = get_model_for_problem_formulation(0)
