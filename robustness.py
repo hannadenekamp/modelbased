@@ -29,7 +29,7 @@ SMALLER = 'SMALLER'
 def costs(data):
     return data[0]/1e9 # makes numbers nicer
 
-Expected_Number_of_Deaths = functools.partial(robustness, SMALLER, 0.001) #not ok
+Expected_Number_of_Deaths = functools.partial(robustness, SMALLER, 0.1) #not ok
 Expected_Annual_Damage = functools.partial(robustness, SMALLER, 80e6) #THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
 Total_Investment_Costs = costs #THOSE NUMBERS NEED TO BE SPECIFIED AGAIN
 
@@ -38,7 +38,7 @@ scenarios = sample_uncertainties(model, n_scenarios)
 # with open('data/scenariosselection.pickle', 'rb') as filehandler:
 #         scenarios = pickle.load(filehandler)
 
-nfe = int(20000)  # Original value: 1000
+nfe = int(200)  # Original value: 1000
 
 MAXIMIZE = ScalarOutcome.MAXIMIZE
 MINIMIZE = ScalarOutcome.MINIMIZE
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     use_pickle4 = False
     if use_pickle4:
-        with open('data/moro_results7.pickle', 'rb') as filehandler:
+        with open('data/moro_results4.pickle', 'rb') as filehandler:
             results4 = pickle.load(filehandler)
     else:
         # we have to change the plausible max for total investment costs
@@ -69,5 +69,6 @@ if __name__ == '__main__':
             results4 = evaluator.robust_optimize(robustnes_functions, scenarios, nfe=nfe,
                                                             convergence=convergence, epsilons=epsilons)
         # Save results in Pickle file
-        with open("data/moro_results7.pickle","wb") as filehandler:
+        with open("data/moro_results4.pickle","wb") as filehandler:
             pickle.dump(results4, filehandler)
+    archive1, convergence = results4
