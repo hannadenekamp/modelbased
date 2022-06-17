@@ -6,6 +6,7 @@ Created on Thu Jul 06 14:51:04 2017
 """
 import numpy as np
 from scipy.interpolate import interp1d
+np.random.seed(0)
 
 
 def dikefailure(sb, inflow, hriver, hbas, hground, status_t1,

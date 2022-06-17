@@ -5,6 +5,7 @@ Created on Sun Oct 29 15:52:12 2017
 @author: ciullo
 """
 import numpy as np
+np.random.seed(0)
 
 
 def cost_fun(ratio, c, b, lambd, dikeinit, dikeincrease):

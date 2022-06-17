@@ -4,6 +4,7 @@ import numpy as np
 import networkx as nx
 import pandas as pd
 from funs_dikes import Lookuplin  # @UnresolvedImport
+np.random.seed(0)
 
 
 def to_dict_dropna(data):
